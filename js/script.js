@@ -47,3 +47,18 @@ function drawYearTrendScene() {
 function drawHorsepowerScene() {
     // implement similar logic with your desired animations
 }
+
+svg.selectAll("circle")
+    .data(parameters.data)
+    .enter()
+    .append("circle")
+    .attr("cx", d => +d.Weight / 10)
+    .attr("cy", 500)
+    .attr("r", 0)
+    .attr("fill", "#2196F3")
+    .attr("opacity", 0.8)
+    .transition()
+    .duration(1200)
+    .attr("cy", d => 500 - (+d.MPG * 10))
+    .attr("r", 6)
+    .ease(d3.easeBounce);
