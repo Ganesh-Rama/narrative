@@ -1,163 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Narrative Visualization: Auto MPG Insights</title>
-
-  <!-- Load Fonts & Libraries -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+<html><head>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
-
   <style>
-    body {
-      background-color: #0a192f;
-      color: #e0e7ff;
-      font-family: 'Montserrat', sans-serif;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
-    }
-
-    #visualization {
-      margin: auto;
-      width: 900px;
-      height: 600px;
-      background-color: #112240;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-    }
-
-    button {
-      background-color: #64ffda;
-      border: none;
-      padding: 12px 20px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin: 20px;
-      transition: all 0.3s ease;
-      font-weight: 600;
-    }
-
-    button:hover {
-      background-color: #52e0b7;
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    text {
+    body { background: #0a192f; color: #e0e7ff; font: 14px sans-serif; text-align: center; }
+    svg { background: #112240; border-radius: 8px; }
+    .annotation-note-label { fill: #64ffda; font-weight: bold; }
+    .tooltip {
+      position: absolute; pointer-events: none;
+      background: rgba(0,0,0,0.7); color: #fff;
+      padding: 4px 8px; border-radius: 4px;
       font-size: 12px;
-      fill: #ccd6f6;
     }
-
-    .annotation-note-label {
-      font-size: 14px;
-      fill: #64ffda;
-      font-weight: 600;
-    }
+    button { margin: 20px; padding: 10px 20px; background: #64ffda; border: none; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #52e0b7; }
   </style>
 </head>
 <body>
+  <h1>Auto MPG Narrative</h1>
+  <div id="viz"><svg width="900" height="600"></svg></div>
+  <button id="btn">Next</button>
+  <div class="tooltip" style="opacity:0"></div>
+  <script>
+    const svg = d3.select("svg");
+    const tooltip = d3.select(".tooltip");
+    const scenes = [scene1, scene2, scene3];
+    let sceneIndex = 0;
 
-<h1>Automobile Fuel Efficiency Insights</h1>
-<div id="visualization">
-  <svg width="900" height="600"></svg>
-</div>
-<button id="nextBtn">Next Scene</button>
+    d3.dsv(" ", DATA_URL, (d,i,cols) => {
+      // merge split columns for name
+      if (cols.length > 9) {
+        d.name = cols.slice(8).join(" ");
+      }
+      return {
+        mpg: +d.mpg, cylinders:+d.cylinders, horsepower:+d.horsepower,
+        weight:+d.weight, acceleration:+d.acceleration,
+        year:+d.year, origin:+d.origin, name:d.name
+      };
+    }).then(data => {
+      data = data.filter(d=>!isNaN(d.horsepower));
+      drawScene();
+      d3.select("#btn").on("click", () => { sceneIndex = (sceneIndex+1)%scenes.length; drawScene(); });
+      function drawScene() {
+        svg.selectAll("*").remove();
+        tooltip.style("opacity",0);
+        scenes[sceneIndex](data);
+      }
+    });
 
-<script>
+    function scene1(data) {
+      // scatterplot HP vs MPG
+      // ... scales, axes, circles, hover tooltip ...
+      // annotation using d3-annotation
+    }
 
-let currentScene = 0;
-const svg = d3.select("#visualization svg");
+    function scene2(data) {
+      // cylinder categorization box/jitter plot
+      // annotate per-cylinder MPG patterns
+      // click to filter/hightlight legend interaction
+    }
 
-// Load and preprocess data
-d3.csv("auto-mpg.csv").then(data => {
-  data.forEach(d => {
-    d.mpg = +d.mpg;
-    d.horsepower = +d.horsepower;
-    d.weight = +d.weight;
-    d.year = +d['model year'];
-  });
-
-  function clearSVG() {
-    svg.selectAll("*").remove();
-  }
-
-  function sceneOverview(data) {
-    clearSVG();
-
-    // Axes
-    const xScale = d3.scaleLinear().domain(d3.extent(data, d => d.horsepower)).range([60, 840]);
-    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d.mpg)).range([540, 60]);
-
-    svg.append("g").attr("transform", "translate(0,540)")
-      .call(d3.axisBottom(xScale));
-
-    svg.append("g").attr("transform", "translate(60,0)")
-      .call(d3.axisLeft(yScale));
-
-    svg.selectAll("circle").data(data)
-      .enter().append("circle")
-      .attr("cx", d => xScale(d.horsepower))
-      .attr("cy", d => yScale(d.mpg))
-      .attr("r", 5)
-      .attr("fill", "#64ffda")
-      .attr("opacity", 0.7);
-
-    // Annotations
-    const annotations = [{
-      note: { title: "Trend", label: "Higher horsepower often means lower MPG." },
-      x: xScale(200), y: yScale(15), dy: -80, dx: -100
-    }];
-
-    svg.append("g").attr("class", "annotation-group")
-      .call(d3.annotation().annotations(annotations));
-  }
-
-  function sceneYearTrend(data) {
-    clearSVG();
-
-    const yearlyAvg = Array.from(d3.rollup(data, v => d3.mean(v, d => d.mpg), d => d.year), ([year, mpg]) => ({year, mpg}));
-
-    const xScale = d3.scaleLinear().domain(d3.extent(yearlyAvg, d => d.year)).range([60, 840]);
-    const yScale = d3.scaleLinear().domain([0, d3.max(yearlyAvg, d => d.mpg)]).range([540, 60]);
-
-    svg.append("g").attr("transform", "translate(0,540)").call(d3.axisBottom(xScale).tickFormat(d3.format("d")));
-    svg.append("g").attr("transform", "translate(60,0)").call(d3.axisLeft(yScale));
-
-    const line = d3.line()
-      .x(d => xScale(d.year))
-      .y(d => yScale(d.mpg));
-
-    svg.append("path")
-      .datum(yearlyAvg)
-      .attr("fill", "none")
-      .attr("stroke", "#64ffda")
-      .attr("stroke-width", 3)
-      .attr("d", line);
-
-    const annotations = [{
-      note: { title: "Improvement", label: "Average MPG improved over years." },
-      x: xScale(80), y: yScale(30), dy: -80, dx: 60
-    }];
-
-    svg.append("g").attr("class", "annotation-group")
-      .call(d3.annotation().annotations(annotations));
-  }
-
-  const scenes = [sceneOverview, sceneYearTrend];
-
-  scenes[currentScene](data);
-
-  d3.select("#nextBtn").on("click", () => {
-    currentScene = (currentScene + 1) % scenes.length;
-    scenes[currentScene](data);
-  });
-
-}).catch(error => console.log(error));
-
-</script>
-</body>
-</html>
+    function scene3(data) {
+      // aggregate per year average MPG
+      // line chart
+      // annotation on upward slope post-1980
+    }
+  </script>
+</body></html>
