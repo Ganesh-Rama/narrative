@@ -1,15 +1,36 @@
 body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7fc;
+    padding: 40px;
+    text-align: center;
 }
 
 button {
-    margin: 5px;
-    padding: 10px;
+    background: linear-gradient(145deg, #ffffff, #e0e5ec);
+    border-radius: 10px;
+    border: none;
+    padding: 15px 30px;
+    margin: 10px;
+    box-shadow:  5px 5px 10px #c3c8d1,
+                 -5px -5px 10px #ffffff;
+    font-size: 16px;
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-svg {
-    border: 1px solid #ccc;
+button:hover {
+    box-shadow: inset 5px 5px 10px #c3c8d1,
+                inset -5px -5px 10px #ffffff;
+    color: #2196F3;
 }
 
+#viz {
+    margin: auto;
+    margin-top: 40px;
+    width: 850px;
+    height: 550px;
+    background-color: #ffffff;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border-radius: 15px;
+    padding: 20px;
+}
