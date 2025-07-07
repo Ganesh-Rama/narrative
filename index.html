@@ -1,10 +1,40 @@
-<button onclick="changeScene(0)">Overview</button>
-<button onclick="changeScene(1)">Trend by Year</button>
-<button onclick="changeScene(2)">Horsepower Correlation</button>
-
-<div id="viz"></div>
-
-<script src="https://d3js.org/d3.v7.min.js"></script>
-<script src="js/script.js"></script>
-
-<div id="tooltip" style="opacity:0; position:absolute; padding:8px; background-color:#333; color:#fff; border-radius:4px;"></div>
+<html>
+<head>
+  <title>Narrative Visualization: Auto MPG</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      text-align: center;
+      padding: 20px;
+    }
+    #visualization {
+      margin: auto;
+      width: 90%;
+      max-width: 1200px;
+    }
+    button {
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <h1>Auto Mileage Insights</h1>
+  <div id="visualization"></div>
+  <button id="sceneButton">Next Insight</button>
+  <script src="visualization.js"></script>
+</body>
+</html>
