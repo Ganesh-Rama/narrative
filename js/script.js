@@ -1,78 +1,36 @@
-let parameters = { scene: 0, data: null };
-
-d3.csv('data/auto-mpg.csv').then(data => {
-    parameters.data = data;
-    drawScene(parameters.scene);
+d3.csv("auto-mpg.csv").then(data => {
+    data.forEach(d => {
+        d.mpg = +d.mpg;
+        d.horsepower = +d.horsepower;
+        d.weight = +d.weight;
+        d.year = +d['model year'];
+    });
+    createVisualization(data);
 });
 
-function drawScene(scene) {
-    d3.select("#viz").html("");
-
-    if(scene == 0) drawIntroScene();
-    if(scene == 1) drawYearTrendScene();
-    if(scene == 2) drawHorsepowerScene();
+function createScene1(data) {
+    // Overview: mpg across car types (Bar/Scatter Chart)
 }
 
-function changeScene(sceneIndex) {
-    parameters.scene = sceneIndex;
-    drawScene(sceneIndex);
+function createScene2(data) {
+    // Horsepower vs. MPG (Interactive Scatter plot)
 }
 
-// Example implementation for intro scene
-function drawIntroScene() {
-    const svg = d3.select("#viz")
-                  .append("svg")
-                  .attr("width", 800)
-                  .attr("height", 500);
-
-    svg.selectAll("circle")
-        .data(parameters.data)
-        .enter()
-        .append("circle")
-        .attr("cx", d => +d.Weight / 10)
-        .attr("cy", d => 500 - (+d.MPG * 10))
-        .attr("r", 5)
-        .attr("fill", "#4CAF50")
-        .attr("opacity", 0)
-        .transition()
-        .duration(800)
-        .attr("opacity", 1);
+function createScene3(data) {
+    // MPG over Years (Animated Line Chart)
 }
+d3.select("#visualization").html("");
+const annotations = [{
+    note: { label: "Note text here", title: "Important insight"},
+    x: 150, y: 200, dy: -30, dx: 50,
+}];
 
-// Similarly, implement your other scenes clearly
-function drawYearTrendScene() {
-    // implement similar logic with your desired animations
-}
-
-function drawHorsepowerScene() {
-    // implement similar logic with your desired animations
-}
-
-svg.selectAll("circle")
-    .data(parameters.data)
-    .enter()
-    .append("circle")
-    .attr("cx", d => +d.Weight / 10)
-    .attr("cy", 500)
-    .attr("r", 0)
-    .attr("fill", "#2196F3")
-    .attr("opacity", 0.8)
-    .transition()
-    .duration(1200)
-    .attr("cy", d => 500 - (+d.MPG * 10))
-    .attr("r", 6)
-    .ease(d3.easeBounce);
-
-const tooltip = d3.select("#tooltip");
-
-svg.selectAll("circle")
-    .on("mouseover", (event, d) => {
-        tooltip.transition().duration(200).style("opacity", 0.9);
-        tooltip.html(`MPG: ${d.MPG}<br>Weight: ${d.Weight}`)
-               .style("left", (event.pageX + 10) + "px")
-               .style("top", (event.pageY - 28) + "px");
-    })
-    .on("mouseout", () => {
-        tooltip.transition().duration(500).style("opacity", 0);
-    });
-
+const makeAnnotations = d3.annotation().annotations(annotations);
+d3.select("#visualization").append("g").call(makeAnnotations);
+let currentScene = 1;
+let selectedManufacturer = "all";
+d3.select("#sceneButton").on("click", function() {
+    currentScene++;
+    if(currentScene > 3) currentScene = 1;
+    updateScene(currentScene);
+});
