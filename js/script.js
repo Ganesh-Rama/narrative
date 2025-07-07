@@ -1,4 +1,4 @@
-d3.csv("auto-mpg.csv").then(data => {
+d3.csv("data\auto-mpg.csv").then(data => {
     data.forEach(d => {
         d.mpg = +d.mpg;
         d.horsepower = +d.horsepower;
