@@ -62,3 +62,17 @@ svg.selectAll("circle")
     .attr("cy", d => 500 - (+d.MPG * 10))
     .attr("r", 6)
     .ease(d3.easeBounce);
+
+const tooltip = d3.select("#tooltip");
+
+svg.selectAll("circle")
+    .on("mouseover", (event, d) => {
+        tooltip.transition().duration(200).style("opacity", 0.9);
+        tooltip.html(`MPG: ${d.MPG}<br>Weight: ${d.Weight}`)
+               .style("left", (event.pageX + 10) + "px")
+               .style("top", (event.pageY - 28) + "px");
+    })
+    .on("mouseout", () => {
+        tooltip.transition().duration(500).style("opacity", 0);
+    });
+
